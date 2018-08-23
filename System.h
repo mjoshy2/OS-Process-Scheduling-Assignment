@@ -1,12 +1,98 @@
 #pragma once
 #include <iostream>
-#include <fstream>
-#include <string>
 #include <vector>
-#include <sstream>
 #include <queue>
-#include "process.h"
 using namespace std;
+
+//represents a single request for example "CORE 20"
+struct request {
+private:
+	string requestType;
+	int requestTime;
+public:
+	request(string a, int b) {
+		requestType = a;
+		requestTime = b;
+	}
+	string getRequestType() {
+		return requestType;
+	}
+	int getRequestTime() {
+		return requestTime;
+	}
+};
+
+//represents a single process
+struct process {
+private:
+	int processID, arrivalTime;
+	string state;
+	vector<request> requests;
+
+public:
+	process(int numID, int arrival) {
+		state = "N/A";
+		processID = numID;
+		arrivalTime = arrival;
+	}
+
+	void addRequest(string req, int requestTime) {
+		request temp(req, requestTime);
+		requests.push_back(temp);
+	}
+
+	request getRequest() {
+		return requests[0];
+	}
+
+	//deletes the requeust at the very top
+	void deleteRequest() {
+		requests.erase(requests.begin());
+	}
+
+	//sets process number to x
+	void setProcessNum(int x) {
+		processID = x;
+	}
+
+	//returns process number
+	int getProcessNum() {
+		return processID;
+	}
+
+	//sets the state of the string to x
+	void setState(string x) {
+		state = x;
+	}
+
+	//returns state of the processes
+	string getState() {
+		return state;
+	}
+
+	//sets arrivalTime to x
+	void setArrivalTime(int x) {
+		arrivalTime = x;
+	}
+
+	//returns arrivalTime
+	int getArrivalTime() {
+		return arrivalTime;
+	}
+	
+	bool empty() {
+		if (requests.size() == 0)
+			return true;
+		else return false;
+	}
+
+	void print() {
+		cout << "process number: " << processID << "  Arrival Time: " << arrivalTime << endl;
+		for (unsigned int i = 0; i < requests.size(); i++) {
+			cout << requests[i].getRequestType() << " " << requests[i].getRequestTime() << endl;;
+		}
+	}
+};
 
 //represents the input device in the system
 class inputDevice {
@@ -143,28 +229,27 @@ public:
 	}
 };
 
-//represents the System itself
+//represents the system itself
 class System {
 private:
 	//numCores is the number of Cores in the System
 	//numProcesses is the total number of processes in the System
-	//processesStarted is the number of processess that have entered the system
+	//processesStarted is the number of processess that have entered the System
 	int numCores, numProcesses, processesStarted = -1;
-	vector<core> coreList; //coreList is a vector of core objects and represent individual cores in the system
+	vector<core> coreList; //coreList is a vector of core objects and represent individual cores in the System
 	vector<process> processList; //processList is a vector of processes
 	SSD ssd; //object of ssd class
 	inputDevice inputD; //object of input device
 	queue <process> readyQueue; //the ready queue is for processess that are waiting for a core
 	queue <process> ssdQueue; // the ssd queue is for processess waiting for the SSD to be available
 	queue <process> inputQueue; //inputQueue is for processess waiting for the input device to be free
-
 public:
-	System(int,int,vector<process>);
+	System(int, int, vector<process>);
 	void findEvent();
 	int freeCores();
 
 	void nextRequestRoutine(process &);
-	
+
 	void coreRequestRoutine(process&);
 	void ssdRequestRoutine(process&);
 	void inputRequestRoutine(process&);
@@ -174,7 +259,7 @@ public:
 	void ssdCompletionRoutine();
 	void inputCompletionRoutine();
 
-	void proccessCompletionRoutine(int);
+	void processCompletionRoutine(int);
 	void simulationCompletionRoutine();
 
 	void printStatusOfCores();

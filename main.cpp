@@ -1,49 +1,43 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
-#include "System.h"
+//Name: Martin Joshy
+//PSID: 1495688
+//Class: Principles of Operating Systems (COSC 3360)
+//Homework 1 - Process Simulation
 
+#include <iostream>
+#include <vector>
+#include "system.h"
 using namespace std;
 
-//reads a string and places the seperate words in a vector and returns the vector
-vector<string> split(string x) {
-	vector<string> temp;
-	string buffer;
-	stringstream ss(x);
+int main() {
+	string word, filename;
+	int number;
+	int processCounter = -1;
+	int numberOfCores;
+	vector<process> processList;
 
-	while (ss >> buffer)
-		temp.push_back(buffer);
-	return temp;
-}
-
-int main(int argc, char*argv[]) {
-	string filename = argv[0,argc-1];
-
-	ifstream file;
-	file.open(filename);
-	string line;
-
-	getline(file, line);
-	vector<string> first = split(line);
-
-	vector<process> list(10);
-	int processNum = -1;
-	while (getline(file, line)) {
-		if (line.substr(0, 3) == "NEW") {
-			processNum++;
-			vector<string> temp = split(line);
-			list[processNum].setArrivalTime(stoi(temp[1]));
-			list[processNum].setProcessNum(processNum);
+	while (cin >> word && cin >> number) {
+		if (word == "NCORES") {
+			numberOfCores = number;
 		}
+
+		else if (word == "NEW") {
+			processCounter++;
+			process temp(processCounter, number);
+			processList.push_back(temp);
+		}
+
 		else {
-			list[processNum].addRequest(line);
+			processList.back().addRequest(word,number);
 		}
 	}
 
-	System simulation(processNum + 1,stoi(first[1]), list);
+	for (int i = 0; i <= processCounter; i++) {
+		processList[i].print();
+		cout << endl;
+	}
+	processCounter++;
 	
-	system("pause");
+	System sys(processCounter, numberOfCores, processList);
+
 	return 0;
 }
